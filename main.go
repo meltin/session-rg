@@ -61,8 +61,8 @@ func main() {
 		fmt.Fprintln(os.Stderr, "Finds sessions where every WORD appears in what the user or Claude said (not tool output). Case is ignored.")
 		flag.PrintDefaults()
 	}
-	flag.Parse()
-	if flag.NArg() == 0 {
+	words, _ := parseArgs(flag.CommandLine, os.Args[1:]) // CommandLine exits on a bad flag
+	if len(words) == 0 {
 		flag.Usage()
 		os.Exit(2)
 	}
@@ -81,7 +81,7 @@ func main() {
 		os.Exit(1)
 	}
 	root := filepath.Join(home, ".claude", "projects")
-	sessions, err := search(root, flag.Args(), cutoff, os.Getenv("CLAUDE_CODE_SESSION_ID"), *limit)
+	sessions, err := search(root, words, cutoff, os.Getenv("CLAUDE_CODE_SESSION_ID"), *limit)
 	if err != nil {
 		fmt.Fprintln(os.Stderr, "session-rg:", err)
 		os.Exit(1)
@@ -103,6 +103,22 @@ func main() {
 		for _, m := range s.Matches {
 			fmt.Fprintf(w, "  %s: %s\n", m.Role, m.Text)
 		}
+	}
+}
+
+// parseArgs lets flags come after words as well (session-rg herdr --since 3d):
+// the flag package stops at the first word, so parse again after each one.
+func parseArgs(fs *flag.FlagSet, args []string) ([]string, error) {
+	var words []string
+	for {
+		if err := fs.Parse(args); err != nil {
+			return nil, err
+		}
+		if fs.NArg() == 0 {
+			return words, nil
+		}
+		words = append(words, fs.Arg(0))
+		args = fs.Args()[1:]
 	}
 }
 

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"os"
 	"path/filepath"
 	"strings"
@@ -93,5 +94,15 @@ func TestSnippet(t *testing.T) {
 	got := snippet(long, "TARGET")
 	if !strings.HasPrefix(got, "…") || !strings.HasSuffix(got, "…") || !strings.Contains(got, "あ target い") {
 		t.Fatalf("snippet = %q", got)
+	}
+}
+
+func TestParseArgs(t *testing.T) {
+	fs := flag.NewFlagSet("session-rg", flag.ContinueOnError)
+	since := fs.String("since", "", "")
+	asJSON := fs.Bool("json", false, "")
+	words, err := parseArgs(fs, []string{"herdr", "--since", "3d", "mod", "--json"})
+	if err != nil || strings.Join(words, ",") != "herdr,mod" || *since != "3d" || !*asJSON {
+		t.Fatalf("words = %q, since = %q, json = %v, err = %v", words, *since, *asJSON, err)
 	}
 }
