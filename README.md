@@ -8,7 +8,7 @@ session-rg herdr mod --since 3d           # every word must appear, in any messa
 session-rg --json --limit 5 '#15'         # JSON Lines for agents
 ```
 
-- Only what the user typed and what Claude wrote is searched: not tool input or output, thinking, or task notifications
+- Only the conversation is searched: user messages (including `!` command output and the summary left by compaction) and Claude's replies. Tool input and output, thinking, text the harness inserts, and task notifications are not
 - Case is ignored; words are plain strings, so Japanese works as is
 - The session running the search (`$CLAUDE_CODE_SESSION_ID`) is left out
 - Every log is read in full, so a session is found however long its last turns were
