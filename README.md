@@ -18,7 +18,15 @@ Resume a result with `cd <cwd> && claude --resume <id>`.
 
 ## Install
 
-Needs Go and `rg`.
+With Nix (ripgrep comes with it):
+
+```sh
+nix profile install github:meltin/session-rg
+```
+
+Or add `github:meltin/session-rg` to a flake's inputs and use `packages.<system>.default`.
+
+With Go (needs `rg` on your PATH):
 
 ```sh
 go build -o ~/.local/bin/session-rg .   # anywhere on your PATH
